@@ -1,5 +1,6 @@
 package edu.handong.csee;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,41 +21,70 @@ import org.apache.commons.cli.HelpFormatter;
 
 
 public class ZipReader extends Thread {
-	String input; //-i
-	String output; // -o
-	String output2; // -another output
+	private String[] argu;
+	private File[] resultList;
+
+	private String input; //-i
+	private String output; // -o
+	private String output2; // -another output
 	boolean help;	//-h	
 
+	ArrayList<String> save = new ArrayList<String>();
+
+
+	public void setArg(String[] args) {
+		argu = args;
+	}
+
+
 	public static void main(String[] args) {
+		int numThreads = 5;
+		Thread[] t = new Thread[numThreads];
+
+		for(int i=0;i<numThreads;i++) {
+			t[i] = new Thread(new ZipReader());
+			t[i].start();
+		}
+
 		ZipReader zipReader = new ZipReader();
 		zipReader.run(args);
 	}
 
+
+
 	private void run(String[] args) {
-		//String path = args[0];
-		//readFileInZip(input);
-		//readFileInZip("0001.zip");
+		try {	
+			// when there are not enough arguments from CLI, it throws the NotEnoughArgmentException which must be defined by you.
+			if(args.length<1)
+				throw new NotEnoughArgumentException();	
+			Options options = createOptions();
 
-		Options options = createOptions();
+			if(parseOptions(options, args)){
+				if (help){
+					printHelp(options);
+					return;
+				}
+				else {
+					getZipFileList(input);
 
-		if(parseOptions(options, args)){
-			if (help){
-				printHelp(options);
-				return;
+					for(File file: resultList) {
+						if(file.getName().contains("zip")){
+							save.add(file.getName());
+							readFileInZip(input + file.getName());
+						}
+
+					}
+					Utils.writeAFile(save, output);
+
+				}
 			}
-			else readFileInZip(input);
-			try {	
-				// when there are not enough arguments from CLI, it throws the NotEnoughArgmentException which must be defined by you.
-				if(args.length<2)
-					throw new NotEnoughArgumentException();
-			} catch (NotEnoughArgumentException e) {
-				System.out.println(e.getMessage());
-				System.exit(0);
-			}
+		} catch (NotEnoughArgumentException e) {
+			System.out.println(e.getMessage());
+			System.exit(0);
 		}
-		System.out.println(input);
-
 	}
+
+
 
 
 	private boolean parseOptions(Options options, String[] args) {
@@ -123,7 +153,6 @@ public class ZipReader extends Thread {
 
 	public void readFileInZip(String path) {
 		ZipFile zipFile;
-		ArrayList<String> save = new ArrayList<String>();
 
 		int count =0;
 		String result = output ;
@@ -149,6 +178,7 @@ public class ZipReader extends Thread {
 					Utils.writeAFile(save, result2);
 
 				count++;
+				save.add("");
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -156,9 +186,12 @@ public class ZipReader extends Thread {
 		}
 	}
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
 
+	public File[] getZipFileList(String path) {
+		File file = new File(path);
+		resultList = file.listFiles();
+
+		return resultList;
 	}
+
 }
