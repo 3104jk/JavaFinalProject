@@ -10,7 +10,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
 import edu.handong.csee.utils.NotEnoughArgumentException;
-//import org.apache.poi.ss.usermodel.CellType;
 import edu.handong.csee.utils.Utils;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -19,9 +18,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 
-
 public class ZipReader extends Thread {
-	private String[] argu;
+
 	private File[] resultList;
 
 	private String input; //-i
@@ -31,11 +29,6 @@ public class ZipReader extends Thread {
 
 	ArrayList<String> save = new ArrayList<String>();
 	ArrayList<String> save2 = new ArrayList<String>();
-
-
-	public void setArg(String[] args) {
-		argu = args;
-	}
 
 
 	public static void main(String[] args) {
@@ -175,8 +168,6 @@ public class ZipReader extends Thread {
 		ZipFile zipFile;
 
 		int count =0;
-		String result = output ;
-		String result2 = output2;
 
 		try {
 			zipFile = new ZipFile(path);

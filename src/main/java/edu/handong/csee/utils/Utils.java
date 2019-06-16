@@ -26,7 +26,6 @@ public class Utils {
 					String alines2 [] = aline2.split("///");
 					printer.printRecord(alines2);
 				}
-				//else if (line.equals("FALSE")) line = "";
 				else {
 					printer.printRecord(a);
 				}
