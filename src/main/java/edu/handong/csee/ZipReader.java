@@ -30,6 +30,7 @@ public class ZipReader extends Thread {
 	boolean help;	//-h	
 
 	ArrayList<String> save = new ArrayList<String>();
+	ArrayList<String> save2 = new ArrayList<String>();
 
 
 	public void setArg(String[] args) {
@@ -50,7 +51,17 @@ public class ZipReader extends Thread {
 		zipReader.run(args);
 	}
 
-
+	class Files <T>{
+		private T t;
+		
+		public void set(T t) {
+			this.t = t;
+		}
+		
+		public T get() {
+			return t;
+		}
+	}
 
 	private void run(String[] args) {
 		try {	
@@ -65,16 +76,25 @@ public class ZipReader extends Thread {
 					return;
 				}
 				else {
-					getZipFileList(input);
+					
+					Files<String> myFile = new Files();
+					
+					myFile.set(input);
+					
+					getZipFileList(myFile.get());
+					
+					//getZipFileList(input);
 
 					for(File file: resultList) {
 						if(file.getName().contains("zip")){
 							save.add(file.getName());
+							save2.add(file.getName());
 							readFileInZip(input + file.getName());
 						}
 
 					}
 					Utils.writeAFile(save, output);
+					Utils.writeAFile(save2,output2);
 
 				}
 			}
@@ -169,16 +189,16 @@ public class ZipReader extends Thread {
 				ExcelReader myReader = new ExcelReader();
 
 				for(String value:myReader.getData(stream)) {
-					save.add(value);
+					if(count ==0)
+						save.add(value);
+					else if(count ==1)
+						save2.add(value);	
 
 				}
-				if(count ==0)
-					Utils.writeAFile(save, result);
-				else if(count ==1)
-					Utils.writeAFile(save, result2);
-
+	
 				count++;
 				save.add("");
+				save2.add("");
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -193,5 +213,7 @@ public class ZipReader extends Thread {
 
 		return resultList;
 	}
+	
+	
 
 }
